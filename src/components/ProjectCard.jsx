@@ -1,45 +1,47 @@
-// src/components/ProjectCard.jsx
-
-import React from "react";
-import { motion } from "framer-motion";
-import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
+import React, { useRef } from "react";
+import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 
 const ProjectCard = ({ project }) => {
+  const ref = useRef();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const handleMouseMove = (e) => {
+    const rect = ref.current.getBoundingClientRect();
+    x.set(e.clientX - rect.left);
+    y.set(e.clientY - rect.top);
+  };
+
+  const background = useMotionTemplate`radial-gradient(240px circle at ${x}px ${y}px, rgba(192, 132, 252, 0.15), transparent 80%)`;
+
   return (
     <motion.div
-      className="bg-gray-900 rounded-xl shadow-lg p-4 flex flex-col gap-3 hover:scale-105 transition-transform duration-300"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      style={{ background }}
+      className="relative overflow-hidden rounded-xl border border-gray-800 p-6 hover:border-pink-500/30 transition-all h-full"
+      whileHover={{ y: -5 }}
     >
-      {/* Project name */}
-      <h3 className="text-lg font-semibold text-pink-400">{project.name}</h3>
-
-      {/* Description */}
-      <p className="text-sm text-gray-400">{project.description}</p>
-
-      {/* Technologies */}
-      <div className="flex flex-wrap gap-2">
-        {project.technologies.map((tech, index) => (
-          <span
-            key={index}
-            className="bg-pink-600 text-xs text-white px-2 py-1 rounded-full"
-          >
+      <h3 className="text-2xl font-bold text-pink-400 mb-2">{project.name}</h3>
+      <p className="text-gray-300 mb-4">{project.description}</p>
+      
+      <div className="flex flex-wrap gap-2 mb-4">
+        {project.technologies.map((tech, i) => (
+          <span key={i} className="px-3 py-1 bg-gray-800 rounded-full text-sm text-gray-300">
             {tech}
           </span>
         ))}
       </div>
 
-      {/* Links */}
-      <div className="flex gap-4 mt-2">
+      <div className="flex gap-4 mt-auto">
         {project.github && (
           <a
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-pink-400 hover:text-pink-300 transition-colors duration-300"
+            className="text-pink-400 hover:text-white transition-colors"
           >
-            <FaGithub size={20} />
+            View Code
           </a>
         )}
         {project.demo && (
@@ -47,9 +49,9 @@ const ProjectCard = ({ project }) => {
             href={project.demo}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-pink-400 hover:text-pink-300 transition-colors duration-300"
+            className="text-pink-400 hover:text-white transition-colors"
           >
-            <FaExternalLinkAlt size={20} />
+            Live Demo
           </a>
         )}
       </div>
